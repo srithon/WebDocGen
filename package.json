@@ -10,9 +10,11 @@
   "author": "srithon",
   "license": "ISC",
   "dependencies": {
-    "puppeteer": "^19.5.2"
+    "puppeteer": "^19.5.2",
+    "yargs": "^17.6.2"
   },
   "devDependencies": {
+    "@types/yargs": "^17.0.20",
     "typescript": "^4.9.4"
   }
 }
