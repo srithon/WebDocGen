@@ -2,13 +2,17 @@
   "name": "webdocgen",
   "version": "0.0.1",
   "description": "Facilitates website documentation creation through Literate Programming, combining Markdown prose with JavaScript running on the website.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "author": "srithon",
   "license": "ISC",
   "dependencies": {
     "puppeteer": "^19.5.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.4"
   }
 }
