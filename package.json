@@ -1,0 +1,11 @@
+{
+  "name": "webdocgen",
+  "version": "0.0.1",
+  "description": "Facilitates website documentation creation through Literate Programming, combining Markdown prose with JavaScript running on the website.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "srithon",
+  "license": "ISC"
+}
