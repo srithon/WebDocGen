@@ -9,6 +9,7 @@ import { strict as assert } from "assert";
 interface Arguments {
   markdownFile: string;
   targetDir: string;
+  viewport?: string;
 }
 
 // first, CLI
@@ -20,6 +21,11 @@ parser.add_argument("markdownFile", {
 parser.add_argument("targetDir", {
   type: "str",
   help: "The directory to output the markdown and screenshots",
+});
+parser.add_argument("--viewport", {
+  type: "str",
+  help: "The width, height and device scale factor of the viewport for taking screenshots: '<WIDTH>x<HEIGHT>[x<SCALE_FACTOR>]'. If unspecified, the scale factor will default to 1. Note that the scale factor effectively acts as a zoom, and so doubling the width and height has a different effect than doubling the scale factor.",
+  required: false,
 });
 
 (async () => {
@@ -48,6 +54,22 @@ parser.add_argument("targetDir", {
 
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+
+  if (args.viewport) {
+    // https://raddevon.com/articles/cant-use-parseint-map-javascript/
+    // It turns out that `map` passes 3 arguments into the callable: the value, the index and the Array.
+    // since parseInt takes in an optional radix parameter, the index was being passed in for the radix andd it was resulting in the height not being parsed properly
+    let [width, height, deviceScaleFactor] = args.viewport
+      .split("x")
+      .map((n) => parseInt(n));
+
+    await page.setViewport({
+      width,
+      height,
+      deviceScaleFactor: deviceScaleFactor || 1,
+    });
+  }
+
   await page.goto(baseURL);
 
   const makeImageLink = (href: string, altText: string) => {
