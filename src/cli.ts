@@ -45,7 +45,6 @@ parser.add_argument("targetDir", {
   const baseURL = attributes.url;
 
   const tokens = marked.lexer(markdown);
-  console.log(tokens);
 
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
