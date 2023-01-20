@@ -4,7 +4,6 @@
   "description": "Facilitates website documentation creation through Literate Programming, combining Markdown prose with JavaScript running on the website.",
   "main": "src/cli.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
   "author": "srithon",
