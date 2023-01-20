@@ -153,7 +153,6 @@ parser.add_argument("--viewport", {
       const type = token.type;
       if (type === "code" && token.lang === "javascript") {
         // first, let's wrap the code in a function that takes in `WebDocGen`.
-        // note that the text itself does not get evaluated.
         const arrowFunc = eval("async () => {\n" + token.text + "\n}");
         await page.evaluate(arrowFunc);
 
