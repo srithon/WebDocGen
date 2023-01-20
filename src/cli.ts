@@ -1,32 +1,28 @@
 import * as puppeteer from "puppeteer";
-import yargs from "yargs/yargs";
-import { hideBin } from "yargs/helpers";
+import { ArgumentParser } from "argparse";
 import { promises as fs } from "fs";
 
+interface Arguments {
+  markdownFile: string;
+}
+
 // first, CLI
-const parser = yargs(hideBin(process.argv)).command('* [markdownFile]', "Default command", (yargs => {
-  yargs.positional('markdownFile', {
-    describe: 'Markdown file to parse',
-    type: 'string',
-    demandOption: true
-  })
-}));
+const parser = new ArgumentParser();
+parser.add_argument("markdownFile", {
+  type: "str",
+  help: "The markdown file to process",
+});
 
 (async () => {
-  const argv = await parser.argv;
+  const args: Arguments = parser.parse_args();
 
-  if (argv.markdownFile === undefined) {
+  if (args.markdownFile === undefined) {
     console.log("Please pass in a markdownFile parameter!");
-    return;
+    process.exit(1);
   }
 
-  console.log(argv);
-
-  console.log(argv.$0)
-
   // first, let's read the file
-  const data = await fs.readFile(argv!.markdownFile, "utf8");
-  console.log(data);
+  const data = await fs.readFile(args.markdownFile, "utf8");
 
   // const browser = await puppeteer.launch();
   // const page = await browser.newPage();
