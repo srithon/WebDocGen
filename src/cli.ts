@@ -1,6 +1,7 @@
 import * as puppeteer from "puppeteer";
 import { ArgumentParser } from "argparse";
 import { promises as fs } from "fs";
+const frontMatter = require("front-matter");
 
 interface Arguments {
   markdownFile: string;
@@ -23,6 +24,10 @@ parser.add_argument("markdownFile", {
 
   // first, let's read the file
   const data = await fs.readFile(args.markdownFile, "utf8");
+
+  const { body: markdown, attributes } = frontMatter(data);
+  console.log(markdown);
+  console.log(attributes);
 
   // const browser = await puppeteer.launch();
   // const page = await browser.newPage();
