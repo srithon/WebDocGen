@@ -55,6 +55,7 @@ parser.add_argument("targetDir", {
     return `![${altText}](${href})\n`;
   };
 
+  let result = "";
   const screenshot = async (altText: string) => {
     const imagePath = `${args.targetDir}/screenshot-${currentCodeBlock}.png`;
     console.log(`Screenshotting to ${imagePath}`);
@@ -96,7 +97,6 @@ parser.add_argument("targetDir", {
   }
 
   let currentCodeBlock = 0;
-  let result = "";
   for (const token of tokens) {
     if ("type" in token) {
       const type = token.type;
