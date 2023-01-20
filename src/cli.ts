@@ -51,29 +51,20 @@ parser.add_argument("targetDir", {
   const page = await browser.newPage();
   await page.goto(baseURL);
 
-  // run the code, passing in a handle to a WebDocGen interface
-  interface WebDocGen {
-    // yield screenshot of current viewport in output
-    screenshot: (altText: string) => Promise<void>;
-    // go back to original URL
-    reset: () => Promise<void>;
-  }
-
   const makeImageLink = (href: string, altText: string) => {
     return `![${altText}](${href})\n`;
   };
 
-  const webDocGen: WebDocGen = {
-    screenshot: async (altText: string) => {
-      const imagePath = `${args.targetDir}/screenshot-${currentCodeBlock}.png`;
-      console.log(`Screenshotting to ${imagePath}`);
-      const screenShotRes = await page.screenshot();
-      await fs.writeFile(imagePath, screenShotRes, { encoding: "binary" });
-      result += makeImageLink(imagePath, altText);
-    },
-    reset: async () => {
-      await page.goto(baseURL);
-    },
+  const screenshot = async (altText: string) => {
+    const imagePath = `${args.targetDir}/screenshot-${currentCodeBlock}.png`;
+    console.log(`Screenshotting to ${imagePath}`);
+    const screenShotRes = await page.screenshot();
+    await fs.writeFile(imagePath, screenShotRes, { encoding: "binary" });
+    result += makeImageLink(imagePath, altText);
+  };
+
+  const reset = async () => {
+    await page.goto(baseURL);
   };
 
   // echo browser console to terminal
@@ -81,13 +72,14 @@ parser.add_argument("targetDir", {
 
   // my mistake was not realizing that these were promises, so I didn't await
   // them
-  await page.exposeFunction("screenshot", webDocGen.screenshot);
-  await page.exposeFunction("reset", webDocGen.reset);
+  let usefulPageFunctions = ["screenshot", "reset"];
+  await page.exposeFunction("screenshot", screenshot);
+  await page.exposeFunction("reset", reset);
 
   // expose some useful functions from puppeteer so they can be used from the
   // document code
-  let usefulPageFunctions = ["click", "select", "hover"];
-  for (const func of usefulPageFunctions) {
+  for (const func of ["click", "select", "hover"]) {
+    usefulPageFunctions.push(func);
     await page.exposeFunction(func, (selector: string) =>
       (page as any)[func](selector)
     );
@@ -99,10 +91,7 @@ parser.add_argument("targetDir", {
   );
 
   // put them in global scope for convenience
-  for (const exposedFunction of usefulPageFunctions.concat([
-    "screenshot",
-    "reset",
-  ])) {
+  for (const exposedFunction of usefulPageFunctions) {
     await page.evaluate(`var ${exposedFunction} = window.${exposedFunction}`);
   }
 
