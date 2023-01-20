@@ -36,6 +36,26 @@ parser.add_argument("--viewport", {
     process.exit(1);
   }
 
+  // first, make sure we have access to `targetDir`
+  await fs.mkdir(args.targetDir).catch((err) => {
+    // if the directory already exists, then make sure we can access it
+    if (err.code === "EEXIST") {
+      return fs.access(
+        args.targetDir,
+        // access
+        fs.constants.F_OK |
+          // read
+          fs.constants.R_OK |
+          // write
+          fs.constants.W_OK |
+          // execute
+          fs.constants.X_OK
+      );
+    } else {
+      return err;
+    }
+  });
+
   // first, let's read the file
   const data = await fs.readFile(args.markdownFile, "utf8");
 
