@@ -1,5 +1,6 @@
 import { ArgumentParser } from "argparse";
 import { promises as fs } from "fs";
+import * as path from "path";
 import * as puppeteer from "puppeteer";
 
 const frontMatter = require("front-matter");
@@ -107,12 +108,6 @@ parser.add_argument("--viewport", {
   // echo browser console to terminal
   page.on("console", (msg) => console.log(msg.text()));
 
-  await page.evaluate(`
-    const sleep = (milliseconds) => {
-      return new Promise(resolve => setTimeout(() => resolve(undefined), milliseconds));
-    };
-  `);
-
   // my mistake was not realizing that these were promises, so I didn't await
   // them
   let usefulPageFunctions = ["screenshot", "reset"];
@@ -138,49 +133,19 @@ parser.add_argument("--viewport", {
     await page.evaluate(`var ${exposedFunction} = window.${exposedFunction}`);
   }
 
-  page.addStyleTag({
-    content: `
-      .dim-overlay {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: #ccc;
-        opacity: 0.85;
-        display: block;
-        z-index: 1000;
-
-        /* https://stackoverflow.com/questions/3680429/click-through-div-to-underlying-elements */
-        pointer-events: none;
-      }
-
-      .dim-overlay-highlight {
-        opacity: 1;
-        z-index: 1001;
-        /* static position doesnt work with z-index */
-        position: relative;
-      }
-    `,
+  await page.addStyleTag({
+    // need to back out of directory because our typescript is being compiled
+    // into javascript in the /lib directory
+    content: (
+      await fs.readFile(path.join(__dirname, "../src/injected_styles.css"))
+    ).toString("utf8"),
   });
 
-  await page.evaluate(`
-    // add empty div for use as dim overlay
-    const dimOverlayDiv = document.createElement("div");
-    document.querySelector("body").appendChild(dimOverlayDiv);
-
-    const highlight = async (selector) => {
-      dimOverlayDiv.classList.add("dim-overlay");
-      document.querySelector(selector).classList.add("dim-overlay-highlight");
-      await sleep(20);
-    }
-
-    const unhighlight = async (selector) => {
-      dimOverlayDiv.classList.remove("dim-overlay");
-      document.querySelector(selector).classList.remove("dim-overlay-highlight");
-      await sleep(20);
-    }
-  `);
+  await page.evaluate(
+    (
+      await fs.readFile(path.join(__dirname, "../src/injected_js.js"))
+    ).toString("utf8")
+  );
 
   let currentCodeBlock = 0;
   for (const token of tokens) {
