@@ -101,8 +101,37 @@ parser.add_argument("--viewport", {
     result += makeImageLink(imagePath, altText);
   };
 
+  let taskQueue: (() => Promise<any>)[] = [];
   const reset = async () => {
     await page.goto(baseURL);
+  };
+
+  interface ClickOptions {
+    newPage?: boolean;
+    waitForSelector?: string;
+  }
+
+  const click = async (selector: string, options?: ClickOptions) => {
+    if (options && options.newPage) {
+      // then, we have to execute this OUTSIDE of the context of the browser.
+      // otherwise, we will get "Execution context was destroyed, most likely because of a navigation."
+      // add the task to the queue
+      taskQueue.push(() => {
+        return Promise.all([
+          click(selector),
+          options.waitForSelector
+            ? page.waitForSelector(options.waitForSelector)
+            : page.waitForNavigation({ waitUntil: ["domcontentloaded"] }),
+        ]);
+      });
+    } else {
+      return Promise.all([
+        options && options.waitForSelector
+          ? page.waitForSelector(options.waitForSelector)
+          : Promise.resolve(undefined),
+        page.click(selector),
+      ]);
+    }
   };
 
   // echo browser console to terminal
@@ -110,23 +139,24 @@ parser.add_argument("--viewport", {
 
   // my mistake was not realizing that these were promises, so I didn't await
   // them
-  let usefulPageFunctions = ["screenshot", "reset"];
+  let usefulPageFunctions = ["screenshot", "reset", "click"];
   await page.exposeFunction("screenshot", screenshot);
   await page.exposeFunction("reset", reset);
+  await page.exposeFunction("click", click);
 
   // expose some useful functions from puppeteer so they can be used from the
   // document code
-  for (const func of ["click", "select", "hover"]) {
+  for (const func of ["select", "hover"]) {
     usefulPageFunctions.push(func);
     await page.exposeFunction(func, (selector: string) =>
       (page as any)[func](selector)
     );
   }
 
-  usefulPageFunctions.push("waitForNavigation");
-  await page.exposeFunction("waitForNavigation", () =>
-    page.waitForNavigation()
-  );
+  for (const func of ["waitForNavigation", "waitForSelector"]) {
+    usefulPageFunctions.push(func);
+    await page.exposeFunction(func, () => (page as any)[func]());
+  }
 
   // put them in global scope for convenience
   for (const exposedFunction of usefulPageFunctions) {
@@ -154,7 +184,15 @@ parser.add_argument("--viewport", {
       if (type === "code" && token.lang === "javascript") {
         // first, let's wrap the code in a function that takes in `WebDocGen`.
         const arrowFunc = eval("async () => {\n" + token.text + "\n}");
+
         await page.evaluate(arrowFunc);
+
+        // now, go through the task queue
+        // NOTE: empty arrays are truthy
+        while (taskQueue.length) {
+          let nextTask = taskQueue.pop();
+          await nextTask!();
+        }
 
         currentCodeBlock += 1;
       } else {
