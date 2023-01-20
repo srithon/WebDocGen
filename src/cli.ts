@@ -117,6 +117,48 @@ parser.add_argument("--viewport", {
     await page.evaluate(`var ${exposedFunction} = window.${exposedFunction}`);
   }
 
+  page.addStyleTag({
+    content: `
+      .dim-overlay {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #ccc;
+        opacity: 0.85;
+        display: block;
+        z-index: 1000;
+
+        /* https://stackoverflow.com/questions/3680429/click-through-div-to-underlying-elements */
+        pointer-events: none;
+      }
+
+      .dim-overlay-highlight {
+        opacity: 1;
+        z-index: 1001;
+        /* static position doesnt work with z-index */
+        position: relative;
+      }
+    `,
+  });
+
+  await page.evaluate(`
+    // add empty div for use as dim overlay
+    const dimOverlayDiv = document.createElement("div");
+    document.querySelector("body").appendChild(dimOverlayDiv);
+
+    const highlight = async (selector) => {
+      dimOverlayDiv.classList.add("dim-overlay");
+      document.querySelector(selector).classList.add("dim-overlay-highlight");
+    }
+
+    const unhighlight = async (selector) => {
+      dimOverlayDiv.classList.remove("dim-overlay");
+      document.querySelector(selector).classList.remove("dim-overlay-highlight");
+    }
+  `);
+
   let currentCodeBlock = 0;
   for (const token of tokens) {
     if ("type" in token) {
