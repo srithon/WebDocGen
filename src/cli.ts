@@ -31,11 +31,6 @@ parser.add_argument("--viewport", {
 (async () => {
   const args: Arguments = parser.parse_args();
 
-  if (args.markdownFile === undefined) {
-    console.log("Please pass in a markdownFile parameter!");
-    process.exit(1);
-  }
-
   // first, make sure we have access to `targetDir`
   await fs.mkdir(args.targetDir).catch((err) => {
     // if the directory already exists, then make sure we can access it
