@@ -130,7 +130,7 @@ parser.add_argument("--viewport", {
 
   // put them in global scope for convenience
   for (const exposedFunction of usefulPageFunctions) {
-    await page.evaluate(`var ${exposedFunction} = window.${exposedFunction}`);
+    await page.evaluate(`const ${exposedFunction} = window.${exposedFunction}`);
   }
 
   await page.addStyleTag({
