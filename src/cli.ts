@@ -157,11 +157,13 @@ parser.add_argument("--viewport", {
     const highlight = async (selector) => {
       dimOverlayDiv.classList.add("dim-overlay");
       document.querySelector(selector).classList.add("dim-overlay-highlight");
+      await sleep(20);
     }
 
     const unhighlight = async (selector) => {
       dimOverlayDiv.classList.remove("dim-overlay");
       document.querySelector(selector).classList.remove("dim-overlay-highlight");
+      await sleep(20);
     }
   `);
 
