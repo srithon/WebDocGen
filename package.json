@@ -2,7 +2,7 @@
   "name": "webdocgen",
   "version": "0.0.1",
   "description": "Facilitates website documentation creation through Literate Programming, combining Markdown prose with JavaScript running on the website.",
-  "main": "src/index.js",
+  "main": "src/cli.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
@@ -10,10 +10,11 @@
   "author": "srithon",
   "license": "ISC",
   "dependencies": {
-    "puppeteer": "^19.5.2",
-    "yargs": "^17.6.2"
+    "argparse": "^2.0.1",
+    "puppeteer": "^19.5.2"
   },
   "devDependencies": {
+    "@types/argparse": "^2.0.10",
     "@types/node": "^18.11.18",
     "@types/yargs": "^17.0.20",
     "typescript": "^4.9.4"
