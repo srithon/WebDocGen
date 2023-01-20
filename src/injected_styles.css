@@ -19,7 +19,7 @@
 
 .dim-overlay-highlight {
     opacity: 1;
-    z-index: 1001;
+    z-index: 1001 !important;
     /* static position doesnt work with z-index */
     position: relative;
 }
