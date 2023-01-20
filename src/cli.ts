@@ -92,6 +92,12 @@ parser.add_argument("--viewport", {
   // echo browser console to terminal
   page.on("console", (msg) => console.log(msg.text()));
 
+  await page.evaluate(`
+    const sleep = (milliseconds) => {
+      return new Promise(resolve => setTimeout(() => resolve(undefined), milliseconds));
+    };
+  `);
+
   // my mistake was not realizing that these were promises, so I didn't await
   // them
   let usefulPageFunctions = ["screenshot", "reset"];
