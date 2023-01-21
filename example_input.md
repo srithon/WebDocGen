@@ -1,15 +1,16 @@
 ---
-# WebDocGen requires YAML frontmatter specifying a `url` parameter
 url: https://google.com
 ---
+
+> WebDocGen requires YAML frontmatter specifying a `url` parameter
 
 # Intro
 
 This is Google.
 Google has a search bar in the middle of the screen.
 
-<!-- you can have things run in the browser using javascript code blocks -->
-<!-- note that the `javascript` tag is required for WebDocGen to run them -->
+> You can have things run in the browser using Javascript code blocks.
+> Note that the `javascript` tag is required for WebDocGen to run them.
 ```javascript
 const searchBarSelector = ".RNNXgb";
 // to persist variables across code blocks, you can set them on `window`
@@ -69,13 +70,12 @@ click(selector, { newPage: true });
 
 ## Let's click on the first one!
 
-<!--
-this is the syntax for adding HTML in the document. for technical details on
-why you can't just use angle brackets, see the source code, towards the end of
-the file. if you want to have literal double curly braces in the output, then
-use three instead of two. if you want three then use four, etc. if there is
-only one curly brace, it is untouched.
--->
+> This is the syntax for adding HTML in the document. For technical details on
+> why you can't just use angle brackets, see the source code, towards the end of
+> the file. If you want to have literal double curly braces in the output, then
+> use three instead of two. If you want three then use four, etc. If there is
+> only one curly brace, it is untouched.
+
 {{div class="html-example"}}
 
 ```javascript
