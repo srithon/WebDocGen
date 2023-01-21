@@ -7,6 +7,8 @@ const frontMatter = require("front-matter");
 import { marked } from "marked";
 import { strict as assert } from "assert";
 
+import { substituteDoubleCurliesForAngleBrackets } from "./util";
+
 interface Arguments {
   markdownFile: string;
   targetDir: string;
@@ -196,7 +198,19 @@ parser.add_argument("--viewport", {
 
         currentCodeBlock += 1;
       } else {
-        result += token.raw;
+        // as the name suggests, this function will transform {{foo}} for
+        // <foo>; see the function's documentation for specific rules. this is
+        // necessary because we need Marked to parse the codeblocks so we can
+        // run them, but if it sees an HTML opening tag then everything between
+        // that and its corresponding closing tag will be parsed as plain text
+        // within an "html" element. therefore, we ask that users use double
+        // curly braces instead of angle brackets when writing HTML in their
+        // Markdown input files, so that Marked will not interpret them as html
+        // tags, and will instead lump them in with regular text. then, we
+        // process that "regular text" and replace the user-provided curly
+        // braces with angle brackets so that in the output it will be parsed
+        // as HTML.
+        result += substituteDoubleCurliesForAngleBrackets(token.raw);
       }
     }
   }
