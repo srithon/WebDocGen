@@ -1,6 +1,6 @@
 {
   "name": "webdocgen",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Facilitates website documentation creation through Literate Programming, combining Markdown prose with JavaScript running on the website.",
   "main": "src/cli.ts",
   "scripts": {
