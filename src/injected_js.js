@@ -8,24 +8,38 @@ const sleep = (milliseconds) => {
 const dimOverlayDiv = document.createElement("div");
 document.querySelector("body").appendChild(dimOverlayDiv);
 
-const highlight = async (selector, makeBackgroundDark) => {
+const highlight = async (selectors, makeBackgroundDark) => {
   dimOverlayDiv.classList.add("dim-overlay");
 
   if (makeBackgroundDark) {
     dimOverlayDiv.classList.add("dark-overlay");
   }
 
-  document.querySelector(selector).classList.add("dim-overlay-highlight");
+  if (!Array.isArray(selectors)) {
+    selectors = [selectors];
+  }
+
+  for (const selector of selectors) {
+    document.querySelector(selector).classList.add("dim-overlay-highlight");
+  }
+
   await sleep(20);
 };
 
-const unhighlight = async (selector, wasBackgroundDark) => {
+const unhighlight = async (selectors, wasBackgroundDark) => {
   dimOverlayDiv.classList.remove("dim-overlay");
 
   if (wasBackgroundDark) {
     dimOverlayDiv.classList.remove("dark-overlay");
   }
 
-  document.querySelector(selector).classList.remove("dim-overlay-highlight");
+  if (!Array.isArray(selectors)) {
+    selectors = [selectors];
+  }
+
+  for (const selector of selectors) {
+    document.querySelector(selector).classList.remove("dim-overlay-highlight");
+  }
+
   await sleep(20);
 };
