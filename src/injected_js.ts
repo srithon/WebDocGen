@@ -49,3 +49,13 @@ const unhighlight = async (
 
   await sleep(20);
 };
+
+const withHighlight = async (
+  selectors: string[] | string,
+  action: () => Promise<any>,
+  makeBackgroundDark?: boolean
+): Promise<void> => {
+  await highlight(selectors, makeBackgroundDark);
+  await action();
+  await unhighlight(selectors, makeBackgroundDark);
+};
