@@ -175,7 +175,7 @@ parser.add_argument("--viewport", {
 
   await page.evaluate(
     (
-      await fs.readFile(path.join(__dirname, "../src/injected_js.js"))
+      await fs.readFile(path.join(__dirname, "./injected_js.js"))
     ).toString("utf8")
   );
 
