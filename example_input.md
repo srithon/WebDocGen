@@ -1,4 +1,5 @@
 ---
+# WebDocGen requires YAML frontmatter specifying a `url` parameter
 url: https://google.com
 ---
 
@@ -7,20 +8,34 @@ url: https://google.com
 This is Google.
 Google has a search bar in the middle of the screen.
 
+<!-- you can have things run in the browser using javascript code blocks -->
+<!-- note that the `javascript` tag is required for WebDocGen to run them -->
 ```javascript
 const searchBarSelector = ".RNNXgb";
+// to persist variables across code blocks, you can set them on `window`
 window.searchBarSelector = searchBarSelector;
 
+// `hover` is one of the exposed functions from puppeteer; given a selector, it
+// will scroll it into view and hover over it
 await hover(searchBarSelector);
+// `withHighlight` is a custom function that performs an action while dimming the webpage, keeping the given selector visible.
+// after `withHighlight` finishes running the action, it will undo the highlight.
+// it takes the selector as the first parameter, the action to perform as the
+// second, and an optional boolean parameter signalling if the background should
+// be dark (true) or light (false) when dimming. it defaults to `false`
 await withHighlight(
   searchBarSelector,
   async () => {
+    // `screenshot` is a function that takes in Alt Text, screenshots the page in
+    // its current state, writing a png file into the target directory, and
+    // interpolates a link to the image within the output markdown file.
     await screenshot("Search bar");
   },
   // make the background dark instead of light
   true
 );
 
+// `click` is another puppeteer function that scrolls a selector into view and clicks on it.
 await click(searchBarSelector);
 ```
 
@@ -42,9 +57,11 @@ await withHighlight(
   true
 );
 
-// when clicking into a new page, it should typically be at the end of the code
-// block since it will not get executed until after the code block ends.
-// notice that I omitted the await since it doesn't make a difference here.
+// when clicking "within the page", like in the previous example, the click will
+// happen immediately. however, when clicking into a new page (clicking on
+// something that will go to another page), it will not get executed until after
+// the code block ends, and so it should typically be at the end of the code
+// block. notice that I omitted the await since it doesn't make a difference here.
 click(selector, { newPage: true });
 ```
 
