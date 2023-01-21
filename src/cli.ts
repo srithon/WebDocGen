@@ -184,7 +184,8 @@ parser.add_argument("--viewport", {
     if ("type" in token) {
       const type = token.type;
       if (type === "code" && token.lang === "javascript") {
-        // first, let's wrap the code in a function that takes in `WebDocGen`.
+        // wrap in an async function so that we can use `await` without getting
+        // the "can't use await here" error.
         const arrowFunc = eval("async () => {\n" + token.text + "\n}");
 
         await page.evaluate(arrowFunc);
