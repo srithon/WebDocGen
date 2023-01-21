@@ -24,7 +24,7 @@ await withHighlight(
 await click(searchBarSelector);
 ```
 
-## Clicking on suggestions
+# Clicking on suggestions
 
 When you click on the search bar, Google gives you a list of suggestions that you can click on.
 
@@ -48,7 +48,7 @@ await withHighlight(
 click(selector, { newPage: true });
 ```
 
-### Let's click on the first one!
+## Let's click on the first one!
 
 <!--
 this is the syntax for adding HTML in the document. for technical details on
