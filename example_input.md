@@ -18,11 +18,12 @@ window.searchBarSelector = searchBarSelector;
 // `hover` is one of the exposed functions from puppeteer; given a selector, it
 // will scroll it into view and hover over it
 await hover(searchBarSelector);
-// `withHighlight` is a custom function that performs an action while dimming the webpage, keeping the given selector visible.
-// after `withHighlight` finishes running the action, it will undo the highlight.
-// it takes the selector as the first parameter, the action to perform as the
-// second, and an optional boolean parameter signalling if the background should
-// be dark (true) or light (false) when dimming. it defaults to `false`
+// `withHighlight` is a custom function that performs an action while dimming the
+// webpage, keeping the given selector visible. after `withHighlight` finishes
+// running the action, it will undo the highlight. it takes the selector as the
+// first parameter, the action to perform as the second, and an optional boolean
+// parameter signalling if the background should be dark (true) or light (false)
+// when dimming. it defaults to `false`
 await withHighlight(
   searchBarSelector,
   async () => {
@@ -35,7 +36,8 @@ await withHighlight(
   true
 );
 
-// `click` is another puppeteer function that scrolls a selector into view and clicks on it.
+// `click` is another puppeteer function that scrolls a selector into view and
+// clicks on it.
 await click(searchBarSelector);
 ```
 
