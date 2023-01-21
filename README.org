@@ -12,3 +12,6 @@ Also, static site generators like [[https://gohugo.io/][Hugo]] and [[https://jek
 * Example
 [[file:example_input.md][This example]] looks at Google.com, and goes through the main features of WebDocGen.
 Unfortunately, it does not render properly within the README as a Markdown source block, since the nested code blocks confuse the parser.
+
+You can see this example compiled to HTML using the linked Pandoc templates [[https://srithon.github.io/WebDocGen-PandocExample][here]].
+To view the (brief) source for the compilation: see [[https://github.com/srithon/WebDocGen-PandocExample][here]].
