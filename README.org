@@ -1,3 +1,18 @@
+#+title: WebDocGen
+#+OPTIONS: toc:nil
+
+WebDocGen is a tool intended for generating web documentation/user manuals for websites.
+Developers can describe their documentation in Markdown, interspersing it with Javascript codeblocks that will be executed in a browser, and whose "results" will be interpolated into an output Markdown file.
+This idea is inspired by the [[https://en.wikipedia.org/wiki/Literate_programming][Literate Programming]] paradigm, and specifically Emacs's [[https://orgmode.org/][Org Mode]].
+
+The beauty of Markdown as an input/output format is that it can be converted to practically any other format.
+Coupled with a [[https://github.com/ryangrose/easy-pandoc-templates][Pandoc template]], you can trivially convert it to HTML or into a PDF with hardly any setup.
+Also, static site generators like [[https://gohugo.io/][Hugo]] and [[https://jekyllrb.com][Jekyll]] have tons of open source themes that you can use, and allow you to take Markdown files and turn them into full-fledged documentation websites.
+
+* Example
+This example looks at Google.com, and goes through the main features of WebDocGen.
+
+#+begin_src markdown :tangle example_input.md
 ---
 url: https://google.com
 ---
@@ -64,3 +79,4 @@ await screenshot("Result of clicking on first item");
 ```
 
 {{/div}}
+#+end_src
