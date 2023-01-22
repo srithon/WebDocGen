@@ -8,12 +8,19 @@ import { marked } from "marked";
 import { strict as assert } from "assert";
 
 import { substituteDoubleCurliesForAngleBrackets } from "./util";
+import * as yaml from "js-yaml";
+
+enum FrontMatterOptions {
+  Omit = "Omit",
+  Keep = "Keep",
+  KeepWithoutURL = "KeepWithoutURL",
+}
 
 interface Arguments {
   markdownFile: string;
   targetDir: string;
   viewport?: string;
-  keepFrontMatter?: boolean;
+  frontMatter?: FrontMatterOptions;
   url?: string;
 }
 
@@ -32,10 +39,10 @@ parser.add_argument("--viewport", {
   help: "The width, height and device scale factor of the viewport for taking screenshots: '<WIDTH>x<HEIGHT>[x<SCALE_FACTOR>]'. If unspecified, the scale factor will default to 1. Note that the scale factor effectively acts as a zoom, and so doubling the width and height has a different effect than doubling the scale factor.",
   required: false,
 });
-parser.add_argument("--keepFrontMatter", {
-  help: "If specified, then retains the frontmatter in the YAML output instead of stripping it out.",
-  default: false,
-  action: BooleanOptionalAction
+parser.add_argument("--frontMatter", {
+  type: "str",
+  help: "Allows customization of what to do with the frontmatter in the output.",
+  choices: Object.values(FrontMatterOptions),
 });
 parser.add_argument("--url", {
   type: "str",
@@ -117,9 +124,25 @@ parser.add_argument("--url", {
     return `![${altText}](${href})\n`;
   };
 
-  // recreate the YAML fences since the `frontmatter` field is only the inner text.
-  // I decided this was easier than finding all the lines until `bodyStart`.
-  let result = (args.keepFrontMatter && frontmatter) ? `---\n${frontmatter}\n---\n` : "";
+  if (args.frontMatter === FrontMatterOptions.KeepWithoutURL) {
+    // then, remove `url` and remake YAML
+    delete attributes.url;
+  }
+
+  let result = "";
+  // don't create YAML if there are no attributes; it would just be empty then
+  if (
+    Object.keys(attributes).length &&
+    args.frontMatter !== FrontMatterOptions.Omit
+  ) {
+    // recreate the YAML fences since the `frontmatter` field is only the inner text.
+    result += "---\n";
+
+    result += yaml.dump(attributes);
+
+    result += "---\n";
+  }
+
   const screenshot = async (altText: string) => {
     const imagePath = `${args.targetDir}/screenshot-${currentCodeBlock}.png`;
     console.log(`Screenshotting to ${imagePath}`);
