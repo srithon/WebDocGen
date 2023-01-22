@@ -22,6 +22,7 @@ interface Arguments {
   viewport?: string;
   frontMatter?: FrontMatterOptions;
   url?: string;
+  headful?: boolean;
 }
 
 // first, CLI
@@ -48,6 +49,11 @@ parser.add_argument("--url", {
   type: "str",
   help: "If specified, foregoes the frontmatter requirement, overriding the frontmatter's `url` value if specified.",
   required: false,
+});
+parser.add_argument("--headful", {
+  help: "If headful, displays the Chromium browser instance. By default, runs headless",
+  required: false,
+  action: BooleanOptionalAction,
 });
 
 (async () => {
@@ -100,7 +106,7 @@ parser.add_argument("--url", {
 
   const tokens = marked.lexer(markdown);
 
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({ headless: !args.headful });
   const page = await browser.newPage();
 
   if (args.viewport) {
