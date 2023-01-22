@@ -1,4 +1,4 @@
-import { ArgumentParser } from "argparse";
+import { ArgumentParser, BooleanOptionalAction } from "argparse";
 import { promises as fs } from "fs";
 import * as path from "path";
 import * as puppeteer from "puppeteer";
@@ -13,6 +13,7 @@ interface Arguments {
   markdownFile: string;
   targetDir: string;
   viewport?: string;
+  keepFrontMatter?: boolean;
 }
 
 // first, CLI
@@ -29,6 +30,11 @@ parser.add_argument("--viewport", {
   type: "str",
   help: "The width, height and device scale factor of the viewport for taking screenshots: '<WIDTH>x<HEIGHT>[x<SCALE_FACTOR>]'. If unspecified, the scale factor will default to 1. Note that the scale factor effectively acts as a zoom, and so doubling the width and height has a different effect than doubling the scale factor.",
   required: false,
+});
+parser.add_argument("--keepFrontMatter", {
+  help: "If specified, then retains the frontmatter in the YAML output instead of stripping it out.",
+  default: false,
+  action: BooleanOptionalAction
 });
 
 (async () => {
@@ -57,7 +63,7 @@ parser.add_argument("--viewport", {
   // first, let's read the file
   const data = await fs.readFile(args.markdownFile, "utf8");
 
-  const { body: markdown, attributes } = frontMatter(data);
+  const { body: markdown, attributes, frontmatter } = frontMatter(data);
 
   if (!("url" in attributes)) {
     console.log(
@@ -94,7 +100,9 @@ parser.add_argument("--viewport", {
     return `![${altText}](${href})\n`;
   };
 
-  let result = "";
+  // recreate the YAML fences since the `frontmatter` field is only the inner text.
+  // I decided this was easier than finding all the lines until `bodyStart`.
+  let result = (args.keepFrontMatter && frontmatter) ? `---\n${frontmatter}\n---\n` : "";
   const screenshot = async (altText: string) => {
     const imagePath = `${args.targetDir}/screenshot-${currentCodeBlock}.png`;
     console.log(`Screenshotting to ${imagePath}`);
