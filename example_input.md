@@ -39,7 +39,7 @@ await withHighlight(
 
 // `click` is another puppeteer function that scrolls a selector into view and
 // clicks on it.
-await click(searchBarSelector);
+await click(".gLFyf");
 ```
 
 # Clicking on suggestions
@@ -48,6 +48,7 @@ When you click on the search bar, Google gives you a list of suggestions that yo
 
 ```javascript
 const selector = "li.sbct:nth-child(1)";
+
 await hover(selector);
 
 const optionsSelector = ".UUbT9";
