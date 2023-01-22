@@ -173,16 +173,14 @@ parser.add_argument("--url", {
 
   // expose some useful functions from puppeteer so they can be used from the
   // document code
-  for (const func of ["select", "hover"]) {
+  for (const func of [
+    "select",
+    "hover",
+    "waitForNavigation",
+    "waitForSelector",
+  ]) {
     usefulPageFunctions.push(func);
-    await page.exposeFunction(func, (selector: string) =>
-      (page as any)[func](selector)
-    );
-  }
-
-  for (const func of ["waitForNavigation", "waitForSelector"]) {
-    usefulPageFunctions.push(func);
-    await page.exposeFunction(func, () => (page as any)[func]());
+    await page.exposeFunction(func, (arg: string) => (page as any)[func](arg));
   }
 
   // put them in global scope for convenience
