@@ -14,6 +14,7 @@ interface Arguments {
   targetDir: string;
   viewport?: string;
   keepFrontMatter?: boolean;
+  url?: string;
 }
 
 // first, CLI
@@ -35,6 +36,11 @@ parser.add_argument("--keepFrontMatter", {
   help: "If specified, then retains the frontmatter in the YAML output instead of stripping it out.",
   default: false,
   action: BooleanOptionalAction
+});
+parser.add_argument("--url", {
+  type: "str",
+  help: "If specified, foregoes the frontmatter requirement, overriding the frontmatter's `url` value if specified.",
+  required: false,
 });
 
 (async () => {
@@ -65,14 +71,25 @@ parser.add_argument("--keepFrontMatter", {
 
   const { body: markdown, attributes, frontmatter } = frontMatter(data);
 
-  if (!("url" in attributes)) {
-    console.log(
-      `Please add YAML frontmatter to ${args.markdownFile} with a "url" parameter.`
-    );
-    process.exit(1);
-  }
+  const getBaseURL = () => {
+    let baseURL = args.url;
+    if (!baseURL) {
+      if ("url" in attributes) {
+        baseURL = attributes!.url;
+      } else {
+        console.log(
+          `Please add YAML frontmatter to ${args.markdownFile} with a "url" parameter.`
+        );
 
-  const baseURL = attributes.url;
+        process.exit(1);
+      }
+    }
+
+    return baseURL;
+  };
+
+  // assert that it is none-null
+  const baseURL = getBaseURL()!;
 
   const tokens = marked.lexer(markdown);
 
