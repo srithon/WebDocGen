@@ -28,10 +28,10 @@ function matchCurly(s: string, startIndex: number): number | undefined {
 /**
  * @param s - The input string, containing raw markdown text.
  * @returns - The input string, except with double curly braces replaced with
- * angle brackets if the left-hand-side text starts with a letter, triple
- * curlies replaced with double curlies, quadruple replaced with triple, etc.
- * Note that this function will throw an Error if the curly braces are not
- * properly matched.
+ * angle brackets if the left-hand-side text starts with a letter or a forward
+ * slash, triple curlies replaced with double curlies, quadruple replaced
+ * with triple, etc. Note that this function will throw an Error if the curly
+ * braces are not properly matched.
  */
 export function substituteDoubleCurliesForAngleBrackets(s: string): string {
   let res = "";
@@ -51,7 +51,7 @@ export function substituteDoubleCurliesForAngleBrackets(s: string): string {
         if (s[i + 2] === "{") {
           // then, take off one layer of curlies and continue
           res += s.substring(i + 1, endIndex - 1);
-        } else if (s[i + 2].match(/[a-z]/i)) {
+        } else if (s[i + 2].match(/[a-z/]/i)) {
           // all HTML tags start with a letter
 
           // then, that's an html tag
