@@ -23,6 +23,7 @@ interface Arguments {
   frontMatter?: FrontMatterOptions;
   url?: string;
   headful?: boolean;
+  outputMarkdownFilename?: string;
 }
 
 // first, CLI
@@ -54,6 +55,11 @@ parser.add_argument("--headful", {
   help: "If headful, displays the Chromium browser instance. By default, runs headless",
   required: false,
   action: BooleanOptionalAction,
+});
+parser.add_argument("--outputMarkdownFilename", {
+  type: "str",
+  help: "Overrides the default `output.md` filename for the created file.",
+  required: false,
 });
 
 (async () => {
@@ -268,8 +274,10 @@ parser.add_argument("--headful", {
     }
   }
 
+  const outputMarkdownFilename = args.outputMarkdownFilename || "output.md";
+
   // finally, write result markdown file
-  await fs.writeFile(`${args.targetDir}/output.md`, result, {
+  await fs.writeFile(`${args.targetDir}/${outputMarkdownFilename}`, result, {
     encoding: "utf8",
   });
 
