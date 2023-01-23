@@ -48,6 +48,7 @@ When you click on the search bar, Google gives you a list of suggestions that yo
 
 ```javascript
 const selector = "li.sbct:nth-child(1)";
+await waitForSelector(selector);
 
 await hover(selector);
 
