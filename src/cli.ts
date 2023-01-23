@@ -75,7 +75,7 @@ parser.add_argument("--outputMarkdownFilename", {
 });
 parser.add_argument("--initMarkdownFile", {
   type: "str",
-  help: "If specified, executes the given Markdown file without compiling it before compiling the main document(s). This can be useful to log into a website, for example.",
+  help: "If specified, executes the given Markdown file without compiling it before compiling the main document(s). This can be useful to log into a website, for example. Note that if `--initMarkdownFilePath` is within `--srcDir`, it will be skipped the second time.",
   required: false,
 });
 
@@ -307,6 +307,9 @@ parser.add_argument("--initMarkdownFile", {
     await page.evaluate(`const ${exposedFunction} = window.${exposedFunction}`);
   }
 
+  const initMarkdownFilePath = args.initMarkdownFile
+    ? path.resolve(args.initMarkdownFile)
+    : undefined;
   if (args.initMarkdownFile) {
     await compileSingleFile(args.initMarkdownFile, args.targetDir);
   }
@@ -343,7 +346,10 @@ parser.add_argument("--initMarkdownFile", {
       //   return Promise.resolve(false);
       // }
 
-      if (path.extname(dirEntry.name) == ".md") {
+      if (
+        path.extname(dirEntry.name) == ".md" &&
+        pathname !== initMarkdownFilePath
+      ) {
         // then, let's process it
         const currentPath = path.dirname(pathname);
         const relativePathFromRoot = path.relative(args.srcDir!, currentPath);
