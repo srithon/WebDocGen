@@ -98,83 +98,6 @@ parser.add_argument("--outputMarkdownFilename", {
   });
 
   const initPage = async () => {
-    if (baseURL) await page.goto(baseURL);
-
-    const makeImageLink = (href: string, altText: string) => {
-      return `![${altText}](${href})\n`;
-    };
-
-    const screenshot = async (altText: string) => {
-      const imagePath = `${targetDir}/screenshot-${currentCodeBlock}.png`;
-      console.log(`Screenshotting to ${imagePath}`);
-      const screenShotRes = await page.screenshot();
-      await fs.writeFile(imagePath, screenShotRes, { encoding: "binary" });
-      result += makeImageLink(imagePath, altText);
-    };
-
-    const reset = async () => {
-      if (baseURL) await page.goto(baseURL);
-    };
-
-    interface ClickOptions {
-      newPage?: boolean;
-      waitForSelector?: string;
-    }
-
-    const click = async (selector: string, options?: ClickOptions) => {
-      if (options && options.newPage) {
-        // then, we have to execute this OUTSIDE of the context of the browser.
-        // otherwise, we will get "Execution context was destroyed, most likely because of a navigation."
-        // add the task to the queue
-        taskQueue.push(() => {
-          return Promise.all([
-            click(selector),
-            options.waitForSelector
-              ? page.waitForSelector(options.waitForSelector)
-              : page.waitForNavigation({ waitUntil: ["domcontentloaded"] }),
-          ]);
-        });
-      } else {
-        return Promise.all([
-          options && options.waitForSelector
-            ? page.waitForSelector(options.waitForSelector)
-            : Promise.resolve(undefined),
-          page.click(selector),
-        ]);
-      }
-    };
-
-    // echo browser console to terminal
-    page.on("console", (msg) => console.log(msg.text()));
-
-    // my mistake was not realizing that these were promises, so I didn't await
-    // them
-    let usefulPageFunctions = ["screenshot", "reset", "click"];
-    await page.exposeFunction("screenshot", screenshot);
-    await page.exposeFunction("reset", reset);
-    await page.exposeFunction("click", click);
-
-    // expose some useful functions from puppeteer so they can be used from the
-    // document code
-    for (const func of [
-      "select",
-      "hover",
-      "waitForNavigation",
-      "waitForSelector",
-    ]) {
-      usefulPageFunctions.push(func);
-      await page.exposeFunction(func, (arg: string) =>
-        (page as any)[func](arg)
-      );
-    }
-
-    // put them in global scope for convenience
-    for (const exposedFunction of usefulPageFunctions) {
-      await page.evaluate(
-        `const ${exposedFunction} = window.${exposedFunction}`
-      );
-    }
-
     await page.addStyleTag({
       // need to back out of directory because our typescript is being compiled
       // into javascript in the /lib directory
@@ -304,6 +227,77 @@ parser.add_argument("--outputMarkdownFilename", {
       height,
       deviceScaleFactor: deviceScaleFactor || 1,
     });
+  }
+
+  const makeImageLink = (href: string, altText: string) => {
+    return `![${altText}](${href})\n`;
+  };
+
+  const screenshot = async (altText: string) => {
+    const imagePath = `${targetDir}/screenshot-${currentCodeBlock}.png`;
+    console.log(`Screenshotting to ${imagePath}`);
+    const screenShotRes = await page.screenshot();
+    await fs.writeFile(imagePath, screenShotRes, { encoding: "binary" });
+    result += makeImageLink(imagePath, altText);
+  };
+
+  const reset = async () => {
+    if (baseURL) await page.goto(baseURL);
+  };
+
+  interface ClickOptions {
+    newPage?: boolean;
+    waitForSelector?: string;
+  }
+
+  const click = async (selector: string, options?: ClickOptions) => {
+    if (options && options.newPage) {
+      // then, we have to execute this OUTSIDE of the context of the browser.
+      // otherwise, we will get "Execution context was destroyed, most likely because of a navigation."
+      // add the task to the queue
+      taskQueue.push(() => {
+        return Promise.all([
+          click(selector),
+          options.waitForSelector
+            ? page.waitForSelector(options.waitForSelector)
+            : page.waitForNavigation({ waitUntil: ["domcontentloaded"] }),
+        ]);
+      });
+    } else {
+      return Promise.all([
+        options && options.waitForSelector
+          ? page.waitForSelector(options.waitForSelector)
+          : Promise.resolve(undefined),
+        page.click(selector),
+      ]);
+    }
+  };
+
+  // echo browser console to terminal
+  page.on("console", (msg) => console.log(msg.text()));
+
+  // my mistake was not realizing that these were promises, so I didn't await
+  // them
+  let usefulPageFunctions = ["screenshot", "reset", "click"];
+  await page.exposeFunction("screenshot", screenshot);
+  await page.exposeFunction("reset", reset);
+  await page.exposeFunction("click", click);
+
+  // expose some useful functions from puppeteer so they can be used from the
+  // document code
+  for (const func of [
+    "select",
+    "hover",
+    "waitForNavigation",
+    "waitForSelector",
+  ]) {
+    usefulPageFunctions.push(func);
+    await page.exposeFunction(func, (arg: string) => (page as any)[func](arg));
+  }
+
+  // put them in global scope for convenience
+  for (const exposedFunction of usefulPageFunctions) {
+    await page.evaluate(`const ${exposedFunction} = window.${exposedFunction}`);
   }
 
   if (args.singleFile) {
