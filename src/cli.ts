@@ -148,8 +148,9 @@ parser.add_argument("--outputMarkdownFilename", {
     // assert that it is none-null
     const baseURL = getBaseURL()!;
 
-    await page.goto(baseURL);
-    await initPage();
+    // if it's null that means that we went to the same page, in which case you
+    // don't have to reinit.
+    if ((await page.goto(baseURL)) !== null) await initPage();
 
     if (args.frontMatter === FrontMatterOptions.KeepWithoutURL) {
       // then, remove `webdocgen-url` and remake YAML
