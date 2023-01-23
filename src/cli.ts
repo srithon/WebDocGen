@@ -348,7 +348,7 @@ parser.add_argument("--outputMarkdownFilename", {
         const outputMarkdownFilename =
           args.outputMarkdownFilename || dirEntry.name;
         // finally, write result markdown file
-        await fs.writeFile(`${args.targetDir}/${outputMarkdownFilename}`, res, {
+        await fs.writeFile(`${targetDir}/${outputMarkdownFilename}`, res, {
           encoding: "utf8",
         });
       }
