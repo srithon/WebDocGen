@@ -1,8 +1,8 @@
 ---
-url: https://google.com
+webdocgen-url: https://google.com
 ---
 
-> WebDocGen requires YAML frontmatter specifying a `url` parameter
+> WebDocGen requires YAML frontmatter specifying a `webdocgen-url` parameter
 
 # Intro
 

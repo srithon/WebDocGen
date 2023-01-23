@@ -48,7 +48,7 @@ parser.add_argument("--frontMatter", {
 });
 parser.add_argument("--url", {
   type: "str",
-  help: "If specified, foregoes the frontmatter requirement, overriding the frontmatter's `url` value if specified.",
+  help: "If specified, foregoes the frontmatter requirement, overriding the frontmatter's `webdocgen-url` value if specified.",
   required: false,
 });
 parser.add_argument("--headful", {
@@ -93,11 +93,11 @@ parser.add_argument("--outputMarkdownFilename", {
   const getBaseURL = () => {
     let baseURL = args.url;
     if (!baseURL) {
-      if ("url" in attributes) {
-        baseURL = attributes!.url;
+      if ("webdocgen-url" in attributes) {
+        baseURL = attributes!["webdocgen-url"];
       } else {
         console.log(
-          `Please add YAML frontmatter to ${args.markdownFile} with a "url" parameter.`
+          `Please add YAML frontmatter to ${args.markdownFile} with a "webdocgen-url" parameter.`
         );
 
         process.exit(1);
@@ -137,8 +137,8 @@ parser.add_argument("--outputMarkdownFilename", {
   };
 
   if (args.frontMatter === FrontMatterOptions.KeepWithoutURL) {
-    // then, remove `url` and remake YAML
-    delete attributes.url;
+    // then, remove `webdocgen-url` and remake YAML
+    delete attributes["webdocgen-url"];
   }
 
   let result = "";
