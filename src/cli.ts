@@ -27,6 +27,7 @@ interface Arguments {
   url?: string;
   headful?: boolean;
   outputMarkdownFilename?: string;
+  initMarkdownFile?: string;
 }
 
 // first, CLI
@@ -70,6 +71,11 @@ parser.add_argument("--headful", {
 parser.add_argument("--outputMarkdownFilename", {
   type: "str",
   help: "Overrides the default `output.md` filename for the created file.",
+  required: false,
+});
+parser.add_argument("--initMarkdownFile", {
+  type: "str",
+  help: "If specified, executes the given Markdown file without compiling it before compiling the main document(s). This can be useful to log into a website, for example.",
   required: false,
 });
 
@@ -299,6 +305,10 @@ parser.add_argument("--outputMarkdownFilename", {
   // put them in global scope for convenience
   for (const exposedFunction of usefulPageFunctions) {
     await page.evaluate(`const ${exposedFunction} = window.${exposedFunction}`);
+  }
+
+  if (args.initMarkdownFile) {
+    await compileSingleFile(args.initMarkdownFile, args.targetDir);
   }
 
   if (args.singleFile) {
